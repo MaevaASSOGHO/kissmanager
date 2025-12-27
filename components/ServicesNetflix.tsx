@@ -1,16 +1,35 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+'use client';
 
-export default function ServicesNetflix({ services = [], onCta }) {
-  const scrollerRef = useRef(null);
+import { useEffect, useRef, useState } from "react";
+
+export type ServiceItem = {
+  id: string;
+  title: string;
+  subtitle?: string;
+  description?: string;
+  image: string;
+  tags?: string[];
+};
+
+type ServicesNetflixProps = {
+  services: ServiceItem[];
+  onCta?: (service: ServiceItem) => void;
+};
+
+export default function ServicesNetflix({
+  services,
+  onCta,
+}: ServicesNetflixProps) {
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [canLeft, setCanLeft] = useState(false);
   const [canRight, setCanRight] = useState(true);
 
-  const scrollByCards = (dir = 1) => {
+  const scrollByCards = (dir: number = 1) => {
     const el = scrollerRef.current;
     if (!el) return;
-    const card = el.querySelector("[data-card]");
+    const card = el.querySelector<HTMLElement>("[data-card]");
     const cardW = card?.getBoundingClientRect().width || 360;
-    const gap = 20; // doit matcher gap-x
+    const gap = 20;
     el.scrollBy({ left: dir * (cardW + gap) * 2, behavior: "smooth" });
   };
 
@@ -26,11 +45,10 @@ export default function ServicesNetflix({ services = [], onCta }) {
     updateArrows();
     const el = scrollerRef.current;
     if (!el) return;
-    const onScroll = () => updateArrows();
-    el.addEventListener("scroll", onScroll, { passive: true });
+    el.addEventListener("scroll", updateArrows, { passive: true });
     window.addEventListener("resize", updateArrows);
     return () => {
-      el.removeEventListener("scroll", onScroll);
+      el.removeEventListener("scroll", updateArrows);
       window.removeEventListener("resize", updateArrows);
     };
   }, []);
