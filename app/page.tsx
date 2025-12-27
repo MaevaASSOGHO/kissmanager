@@ -8,6 +8,15 @@ import Contact from "@/components/Contact";
 import AboutSection from '@/components/AboutSection';
 import CollabSplit from '@/components/CollabSplit';
 
+type ServiceItem = {
+  id: string;
+  title: string;
+  subtitle: string;
+  image: string;
+  description?: string;
+  tags?: string[];
+};
+
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeService, setActiveService] = useState(0);
@@ -18,7 +27,7 @@ export default function Home() {
   const CTA_IMAGE = "/cta/cta-banner.jpg";
 
   // Données des services
-  const services = [
+  const services: ServiceItem[] = [
     {
       id: "01",
       title: "Marketing Strategies",
@@ -43,7 +52,6 @@ export default function Home() {
       subtitle: "Gestion, publication, communauté : une exécution complète.",
       image: "/services/social.jpg",
     },
-    // Ajoute “Data Analytics”, “Dashboards & Reports” si tu veux
   ];
 
 
@@ -371,12 +379,8 @@ const brands = [
       <AboutSection />
 
       {/* Section Services */}
-      <ServicesNetflix
-        services={services}
-        onCta={(service) => {
-          console.log("Service cliqué :", service);
-        }}
-      />
+      <ServicesNetflix services={services} />
+
 
       {/* Section Portfolio */}
       <section id="portfolio" className="py-20 pt-8 bg-white">
