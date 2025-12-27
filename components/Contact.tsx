@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { StatsStrip } from "./StatsStrip";
 
 type ContactProps = {
   calendlyUrl: string;
@@ -58,14 +59,7 @@ export default function Contact({
         </div>
       </div>
 
-      {/* 3 stats only */}
-      <div className="bg-white/[0.06] border-b border-white/10">
-        <div className="px-6 sm:px-10 lg:px-14 py-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <Stat k="48h" v="Réponse moyenne" />
-          <Stat k="Data + Créa" v="Approche premium" />
-          <Stat k="Social Media" v="Exécution complète" />
-        </div>
-      </div>
+      <StatsStrip />
 
       {/* Actions */}
       <div className="px-6 sm:px-10 lg:px-14">

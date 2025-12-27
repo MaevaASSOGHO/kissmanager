@@ -369,7 +369,7 @@ function Feature({ icon, title, desc }: { icon: React.ReactNode; title: string; 
               <div className="absolute inset-0">
                 {/* Example: video or image background */}
                 <img src="/about.JPG" alt="" className="h-full w-full object-cover" />
-                <div className="h-full w-full bg-[radial-gradient(120%_80%_at_20%_20%,rgba(245,158,11,0.25)_0%,rgba(0,0,0,0)_50%),radial-gradient(120%_80%_at_80%_30%,rgba(168,85,247,0.22)_0%,rgba(0,0,0,0)_55%),linear-gradient(to_br,rgba(255,255,255,0.06),rgba(0,0,0,0))]" />
+                <div className="h-full w-full bg-[radial-gradient(120%_80%_at_20%_20%,rgba(245,158,11,0.25)_0%,rgba(0,0,0,0)_50%),radial-gradient(120%_80%_at_80%_30%,rgba(168,85,247,0.22)_0%,rgba(0,0,0,0)_55%),linear-gradient(to_bottom_right,rgba(255,255,255,0.06),rgba(0,0,0,0))]" />
                 <div className="absolute inset-0 bg-black/25" />
                 <div className="absolute inset-0 bg-[radial-gradient(70%_60%_at_50%_35%,rgba(0,0,0,0)_0%,rgba(0,0,0,0.55)_75%,rgba(0,0,0,0.9)_100%)]" />
               </div>

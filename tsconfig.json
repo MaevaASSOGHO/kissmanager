@@ -35,7 +35,7 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "app/page.tsx", "app/layout.tsx", "components/WorkGrid.tsx"  ],
+, "app/page.tsx", "app/layout.tsx", "components/WorkGrid.tsx", "components/CollabSplit.tsx"  ],
   "exclude": [
     "node_modules"
   ]

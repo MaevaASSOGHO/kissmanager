@@ -429,6 +429,9 @@ const brands = [
               <p className="text-gray-400 max-w-md">
                 Expertise d&apos;excellence en stratégie réseaux sociaux pour les marques ambitieuses.
               </p>
+              <p className="mt-4 text-gray-400">
+                📍 Abidjan, Côte d&apos;Ivoire
+              </p>
             </div>
             
             <div className="grid grid-cols-2 gap-8">

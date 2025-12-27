@@ -1,8 +1,7 @@
 "use client";
+import { useEffect, useRef, useState } from "react";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-
-export type Collaboration = {
+type Collab = {
   company: string;
   category: string;
   description: string;
@@ -10,272 +9,239 @@ export type Collaboration = {
   tags?: string[];
 };
 
-type Props = {
-  collaborations: Collaboration[];
-  onCta?: () => void;
-};
+export default function CollabSplit({
+  collaborations,
+  activeIndex,
+  setActiveIndex,
+}: {
+  collaborations: Collab[];
+  activeIndex: number;
+  setActiveIndex: (n: number) => void;
+}) {
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [viewIndex, setViewIndex] = useState(activeIndex);
+  const [contentKey, setContentKey] = useState(0);
 
-export default function CollabSplit({ collaborations, onCta }: Props) {
-  const trackRef = useRef<HTMLDivElement | null>(null);
-  const [active, setActive] = useState(0);
+  const timeoutRef = useRef<number | null>(null);
 
-  // Pour rejouer l’animation “ciné” quand le slide actif change
-  const [cineKey, setCineKey] = useState(0);
+  // ✅ Swipe target
+  const swipeRef = useRef<HTMLDivElement | null>(null);
 
-  // Drag-to-scroll (Netflix style)
-  const drag = useRef({
-    isDown: false,
-    startX: 0,
-    startLeft: 0,
-    moved: false,
-  });
-
-  const items = useMemo(() => collaborations ?? [], [collaborations]);
+  // ✅ internal swipe state
+  const touchStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
+  const wheelAccRef = useRef(0);
+  const wheelTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    setCineKey((k) => k + 1);
-  }, [active]);
+    return () => {
+      if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+      if (wheelTimerRef.current) window.clearTimeout(wheelTimerRef.current);
+    };
+  }, []);
 
-  const scrollToIndex = (i: number) => {
-    const el = trackRef.current;
-    if (!el) return;
-    const cards = Array.from(el.querySelectorAll<HTMLElement>("[data-card]"));
-    const card = cards[i];
-    if (!card) return;
-    card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  useEffect(() => {
+    setViewIndex(activeIndex);
+  }, [activeIndex]);
+
+  const goTo = (next: number) => {
+    if (isTransitioning) return;
+
+    const total = collaborations.length;
+    const normalized = (next + total) % total;
+
+    setIsTransitioning(true);
+
+    setActiveIndex(normalized);
+    setViewIndex(normalized);
+    setContentKey((k) => k + 1);
+
+    timeoutRef.current = window.setTimeout(() => {
+      setIsTransitioning(false);
+    }, 520);
   };
 
-  const onScroll = () => {
-    const el = trackRef.current;
+  const prev = () => goTo(activeIndex - 1);
+  const next = () => goTo(activeIndex + 1);
+
+  const collab = collaborations[viewIndex];
+
+  const tags = collab.tags?.length
+    ? collab.tags
+    : ["Stratégie social media", "Création", "Performance"];
+
+  // ✅ Helper: ignore swipe when clicking interactive elements
+  const isInteractiveTarget = (target: EventTarget | null) => {
+    if (!(target instanceof HTMLElement)) return false;
+    return Boolean(target.closest("button,a,input,textarea,select,[role='button']"));
+  };
+
+  // ✅ Attach real listeners (non-passive touch) + wheel (trackpad)
+  useEffect(() => {
+    const el = swipeRef.current;
     if (!el) return;
 
-    const cards = Array.from(el.querySelectorAll<HTMLElement>("[data-card]"));
-    if (!cards.length) return;
+    const THRESHOLD = 65; // distance swipe touch
+    const FAST_MS = 450;
+    const FAST_THRESHOLD = 45;
 
-    const center = el.scrollLeft + el.clientWidth / 2;
+    const onTouchStart = (e: TouchEvent) => {
+      if (isInteractiveTarget(e.target)) return;
+      if (isTransitioning) return;
 
-    let best = 0;
-    let bestDist = Infinity;
+      const t = e.touches[0];
+      touchStartRef.current = { x: t.clientX, y: t.clientY, t: Date.now() };
+    };
 
-    cards.forEach((c, idx) => {
-      const cCenter = c.offsetLeft + c.clientWidth / 2;
-      const dist = Math.abs(cCenter - center);
-      if (dist < bestDist) {
-        bestDist = dist;
-        best = idx;
+    const onTouchMove = (e: TouchEvent) => {
+      // If it's a clear horizontal swipe, prevent vertical scroll
+      const s = touchStartRef.current;
+      if (!s) return;
+
+      const t = e.touches[0];
+      const dx = t.clientX - s.x;
+      const dy = t.clientY - s.y;
+
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
+        // critical: needs passive:false
+        e.preventDefault();
       }
-    });
+    };
 
-    setActive(best);
-  };
+    const onTouchEnd = (e: TouchEvent) => {
+      const s = touchStartRef.current;
+      touchStartRef.current = null;
+      if (!s) return;
+      if (isTransitioning) return;
 
-  const onPointerDown: React.PointerEventHandler<HTMLDivElement> = (e) => {
-    const el = trackRef.current;
-    if (!el) return;
-    drag.current.isDown = true;
-    drag.current.moved = false;
-    drag.current.startX = e.clientX;
-    drag.current.startLeft = el.scrollLeft;
-    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-  };
+      const t = e.changedTouches[0];
+      const dx = t.clientX - s.x;
+      const dy = t.clientY - s.y;
+      const dt = Date.now() - s.t;
 
-  const onPointerMove: React.PointerEventHandler<HTMLDivElement> = (e) => {
-    const el = trackRef.current;
-    if (!el) return;
-    if (!drag.current.isDown) return;
+      // ignore if mostly vertical
+      if (Math.abs(dy) > Math.abs(dx)) return;
 
-    const dx = e.clientX - drag.current.startX;
-    if (Math.abs(dx) > 4) drag.current.moved = true;
-    el.scrollLeft = drag.current.startLeft - dx;
-  };
+      const ok =
+        Math.abs(dx) >= THRESHOLD || (dt <= FAST_MS && Math.abs(dx) >= FAST_THRESHOLD);
 
-  const onPointerUp: React.PointerEventHandler<HTMLDivElement> = () => {
-    const el = trackRef.current;
-    if (!el) return;
-    drag.current.isDown = false;
+      if (!ok) return;
 
-    // Snap “soft” vers la carte la plus proche (petit délai pour laisser le scroll finir)
-    setTimeout(() => {
-      scrollToIndex(active);
-    }, 50);
-  };
+      if (dx < 0) next();
+      else prev();
+    };
 
-  const prev = () => scrollToIndex(Math.max(0, active - 1));
-  const next = () => scrollToIndex(Math.min(items.length - 1, active + 1));
+    const onWheel = (e: WheelEvent) => {
+      if (isTransitioning) return;
+      if (isInteractiveTarget(e.target)) return;
 
-  const current = items[active] || items[0];
-  const tags = (current?.tags?.length ? current.tags : ["Stratégie", "Création", "Community", "Performance"]).slice(0, 4);
+      // Trackpad swipe horizontal = deltaX, sometimes deltaY used with shift
+      const dx = Math.abs(e.deltaX) >= Math.abs(e.deltaY) ? e.deltaX : 0;
+      const dy = Math.abs(e.deltaY);
+
+      // If user is scrolling mostly vertical, ignore
+      if (dx === 0 && dy > 0) return;
+
+      // accumulate horizontal intent
+      wheelAccRef.current += dx;
+
+      // reset accumulator after a short pause
+      if (wheelTimerRef.current) window.clearTimeout(wheelTimerRef.current);
+      wheelTimerRef.current = window.setTimeout(() => {
+        wheelAccRef.current = 0;
+      }, 180);
+
+      const WHEEL_THRESHOLD = 140;
+      if (wheelAccRef.current <= -WHEEL_THRESHOLD) {
+        wheelAccRef.current = 0;
+        next();
+      } else if (wheelAccRef.current >= WHEEL_THRESHOLD) {
+        wheelAccRef.current = 0;
+        prev();
+      }
+    };
+
+    // attach (touchmove needs passive:false)
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd, { passive: true });
+    el.addEventListener("wheel", onWheel, { passive: true });
+
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+      el.removeEventListener("wheel", onWheel);
+    };
+  }, [isTransitioning, activeIndex]); // keep it simple
 
   return (
-    <section className="bg-black text-white">
-      {/* Header */}
-      <div className="px-6 sm:px-10 lg:px-14 pt-16">
-        <div className="inline-flex items-center gap-3 text-xs sm:text-sm tracking-[0.35em] uppercase text-white/60">
-          <span className="h-px w-10 bg-gold/80" />
-          <span className="text-white">Collaborations</span>
-        </div>
+    <div
+      ref={swipeRef}
+      className="grid lg:grid-cols-2 select-none"
+      // helps iOS treat as swipe area
+      style={{ touchAction: "pan-y" }}
+    >
+      {/* Image */}
+      <div className="relative min-h-[360px] lg:min-h-[520px] overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black" />
 
-        <div className="mt-5 flex items-end justify-between gap-6">
-          <h5 className="text-lg sm:text-2xl md:text-3xl font-semibold leading-tight">
-            Les plus récentes
-          </h5>
+        <img
+          key={`img-${contentKey}`}
+          src={collab.image}
+          alt={collab.company}
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{
+            animation: "collabImageIn 0.9s cubic-bezier(0.22,1,0.36,1) both",
+          }}
+          draggable={false}
+        />
 
-          {/* Progress dots */}
-          <div className="hidden sm:flex items-center gap-2">
-            {items.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => scrollToIndex(i)}
-                aria-label={`Aller à la collaboration ${i + 1}`}
-                className={`h-2 rounded-full transition-all ${
-                  i === active ? "w-8 bg-gold" : "w-2 bg-white/25 hover:bg-white/40"
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
+        <div className="absolute inset-0 bg-black/25" />
+        <div className="absolute inset-0 bg-[radial-gradient(70%_60%_at_50%_35%,rgba(0,0,0,0)_0%,rgba(0,0,0,0.55)_75%,rgba(0,0,0,0.9)_100%)]" />
 
-      {/* Slider */}
-      <div className="mt-8">
-        <div className="relative">
-          {/* Arrows (desktop) */}
-          <button
-            onClick={prev}
-            className="hidden lg:flex absolute left-6 top-1/2 -translate-y-1/2 z-20 h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/40 backdrop-blur hover:border-gold hover:bg-gold/10 transition"
-            aria-label="Précédent"
-          >
-            <svg className="w-5 h-5 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-
-          <button
-            onClick={next}
-            className="hidden lg:flex absolute right-6 top-1/2 -translate-y-1/2 z-20 h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/40 backdrop-blur hover:border-gold hover:bg-gold/10 transition"
-            aria-label="Suivant"
-          >
-            <svg className="w-5 h-5 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-
-          {/* Track */}
+        <div className="relative z-10 h-full p-8 sm:p-10 lg:p-12 flex items-end">
           <div
-            ref={trackRef}
-            onScroll={onScroll}
-            onPointerDown={onPointerDown}
-            onPointerMove={onPointerMove}
-            onPointerUp={onPointerUp}
-            onPointerCancel={onPointerUp}
-            className="
-              flex gap-0 overflow-x-auto
-              scroll-smooth snap-x snap-mandatory
-              [scrollbar-width:none] [-ms-overflow-style:none]
-              cursor-grab active:cursor-grabbing
-              px-6 sm:px-10 lg:px-14
-            "
-            style={{ WebkitOverflowScrolling: "touch" }}
-          >
-            {/* hide scrollbar (webkit) */}
-            <style jsx>{`
-              div::-webkit-scrollbar {
-                display: none;
-              }
-            `}</style>
-
-            {items.map((c, i) => (
-              <article
-                key={c.company + i}
-                data-card
-                className="
-                  snap-center shrink-0
-                  w-[88vw] sm:w-[70vw] lg:w-[58vw] xl:w-[52vw]
-                  pr-0
-                "
-              >
-                {/* Card (split inside) */}
-                <div className="grid lg:grid-cols-2 border-y border-white/10">
-                  {/* Visual */}
-                  <div className="relative min-h-[360px] lg:min-h-[520px] overflow-hidden">
-                    <img
-                      src={c.image}
-                      alt={c.company}
-                      className="absolute inset-0 h-full w-full object-cover"
-                      draggable={false}
-                    />
-                    <div className="absolute inset-0 bg-black/25" />
-                    <div className="absolute inset-0 bg-[radial-gradient(70%_60%_at_50%_35%,rgba(0,0,0,0)_0%,rgba(0,0,0,0.55)_75%,rgba(0,0,0,0.9)_100%)]" />
-
-                    <div className="relative z-10 h-full p-8 sm:p-10 lg:p-12 flex items-end">
-                      <div className="max-w-lg">
-                        <div className="text-white/70 text-sm tracking-[0.25em] uppercase">
-                          {c.category}
-                        </div>
-                        <div className="mt-3 text-white text-3xl sm:text-4xl font-semibold leading-tight">
-                          {c.company}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="px-6 sm:px-10 lg:px-12 py-12 lg:py-16 flex items-center">
-                    <div className="max-w-xl">
-                      <div className="inline-flex items-center gap-2 border border-white/10 bg-white/[0.04] px-4 py-2 rounded-full">
-                        <span className="text-xs tracking-[0.25em] uppercase text-white/70">
-                          Étude de cas
-                        </span>
-                      </div>
-
-                      <h4 className="mt-5 text-2xl sm:text-3xl font-semibold">
-                        {c.company}
-                      </h4>
-
-                      <p className="mt-5 text-white/70 text-lg leading-relaxed">
-                        {c.description}
-                      </p>
-
-                      <div className="mt-8">
-                        <button
-                          onClick={() => {
-                            const el = document.getElementById("contact");
-                            el?.scrollIntoView({ behavior: "smooth" });
-                          }}
-                          className="rounded-xl px-6 py-3 bg-gold text-black font-semibold hover:brightness-95 transition"
-                        >
-                          Discuter avec nous
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Cinematic details for ACTIVE slide (below slider) */}
-      {current && (
-        <div className="px-6 sm:px-10 lg:px-14 pt-10 pb-16">
-          <div
-            key={cineKey}
-            className="max-w-4xl"
+            key={`imgtxt-${contentKey}`}
+            className="max-w-lg"
             style={{
               animation: "collabFadeUp 0.95s cubic-bezier(0.22,1,0.36,1) both",
             }}
           >
-            <div className="text-xs tracking-[0.35em] uppercase text-white/60">
-              Focus
+            <div className="text-white/70 text-sm tracking-[0.25em] uppercase">
+              {collab.category}
             </div>
-            <div className="mt-3 text-2xl sm:text-3xl font-semibold">
-              {current.company}
+            <div className="mt-3 text-white text-3xl sm:text-4xl font-semibold leading-tight">
+              {collab.company}
             </div>
+          </div>
+        </div>
+      </div>
 
-            {/* Tags ciné */}
-            <div key={`tags-${cineKey}`} className="mt-6 flex flex-wrap gap-3">
-              {tags.map((t, i) => (
+      {/* Texte */}
+      <div className="px-6 sm:px-10 lg:px-12 py-12 lg:py-16 flex items-center">
+        <div className="max-w-xl">
+          <div className="inline-flex items-center gap-2 border border-white/10 bg-white/[0.04] px-4 py-2 rounded-full">
+            <span className="text-xs tracking-[0.25em] uppercase text-white/70">
+              Étude de cas
+            </span>
+          </div>
+
+          <div
+            key={`content-${contentKey}`}
+            style={{
+              animation: "collabFadeUp 0.95s cubic-bezier(0.22,1,0.36,1) both",
+            }}
+          >
+            <h4 className="mt-5 text-2xl sm:text-3xl font-semibold">
+              {collab.company}
+            </h4>
+
+            <p className="mt-5 text-white/70 text-lg leading-relaxed">
+              {collab.description}
+            </p>
+
+            <div key={`tags-${contentKey}`} className="mt-7 flex flex-wrap gap-3">
+              {tags.slice(0, 4).map((t, i) => (
                 <span
                   key={t}
                   className="
@@ -297,8 +263,43 @@ export default function CollabSplit({ collaborations, onCta }: Props) {
               ))}
             </div>
           </div>
+
+          {/* Boutons (optionnels) */}
+          <div className="mt-10 flex items-center gap-4">
+            <button
+              onClick={prev}
+              className="h-12 w-12 border border-white/20 rounded-full flex items-center justify-center hover:border-gold hover:bg-gold/5 transition disabled:opacity-50"
+              aria-label="Collaboration précédente"
+              disabled={isTransitioning}
+            >
+              <svg className="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            <button
+              onClick={next}
+              className="h-12 w-12 border border-white/20 rounded-full flex items-center justify-center hover:border-gold hover:bg-gold/5 transition disabled:opacity-50"
+              aria-label="Collaboration suivante"
+              disabled={isTransitioning}
+            >
+              <svg className="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            <button
+              onClick={() => {
+                const el = document.getElementById("contact");
+                el?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="ml-2 rounded-xl px-6 py-3 bg-gold text-black font-semibold hover:brightness-95 transition"
+            >
+              Discuter avec nous
+            </button>
+          </div>
         </div>
-      )}
-    </section>
+      </div>
+    </div>
   );
 }
