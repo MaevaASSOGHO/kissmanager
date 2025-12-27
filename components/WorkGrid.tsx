@@ -26,10 +26,10 @@ export default function BrandStrip({ brands }: { brands: Brand[] }) {
             >
               {/* Logo */}
               <img
-                src={b.logo}
-                alt={b.name}
-                className="h-8 sm:h-9 md:h-10 w-auto opacity-90 hover:opacity-100 transition"
-                loading="lazy"
+              src={b.logo}
+              alt={b.name}
+              className="h-12 sm:h-14 md:h-16 w-auto opacity-90 hover:opacity-100 transition"
+              loading="lazy"
               />
             </div>
           ))}

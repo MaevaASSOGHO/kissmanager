@@ -23,6 +23,7 @@ export default function ServicesNetflix({
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [canLeft, setCanLeft] = useState(false);
   const [canRight, setCanRight] = useState(true);
+  const [expandedCard, setExpandedCard] = useState<string | null>(null);
 
   const scrollByCards = (dir: number = 1) => {
     const el = scrollerRef.current;
@@ -39,6 +40,10 @@ export default function ServicesNetflix({
     const max = el.scrollWidth - el.clientWidth - 2;
     setCanLeft(el.scrollLeft > 2);
     setCanRight(el.scrollLeft < max);
+  };
+
+  const toggleExpand = (id: string) => {
+    setExpandedCard(expandedCard === id ? null : id);
   };
 
   useEffect(() => {
@@ -119,68 +124,103 @@ export default function ServicesNetflix({
                     snap-start shrink-0
                     w-[88vw] sm:w-[54vw] md:w-[420px] lg:w-[520px] xl:w-[560px]
                 "
-                >
+              >
                 <div
-                    className="
+                  className="
                     group relative overflow-hidden
                     border border-white/10 bg-white/5
                     aspect-[4/5]
                     shadow-[0_18px_70px_rgba(0,0,0,0.55)]
-                    transition-transform duration-500
+                    transition-all duration-500
                     hover:-translate-y-1 hover:shadow-[0_26px_90px_rgba(0,0,0,0.7)]
-                    "
+                  "
                 >
-                    {/* Background image */}
-                    <div
+                  {/* Background image */}
+                  <div
                     className="absolute inset-0 bg-center bg-cover"
                     style={{ backgroundImage: `url(${s.image})` }}
-                    />
+                  />
 
-                    {/* Overlay */}
-                    <div className="absolute inset-0 bg-black/20" />
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/10 to-black/70" />
+                  {/* Overlay - ajusté pour mieux voir le texte */}
+                  <div className="absolute inset-0 bg-black/25" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/20 to-black/80" />
 
-                    {/* Top title */}
-                    <div className="absolute inset-x-0 top-0 p-7 sm:p-8">
+                  {/* Top title */}
+                  <div className="absolute inset-x-0 top-0 p-7 sm:p-8">
                     <h3 className="text-3xl sm:text-4xl md:text-5xl font-semibold leading-[1] tracking-tight">
-                        {s.title}
+                      {s.title}
                     </h3>
-                    </div>
+                  </div>
 
-                    {/* One-line service explanation (lower) */}
-                    <div className="absolute inset-x-0 bottom-0 p-7 sm:p-8">
-                    <p className="text-white/80 text-base sm:text-lg leading-relaxed line-clamp-2 max-w-[34ch]">
-                        {s.description ?? s.subtitle ?? ""}
-                    </p>
-                    </div>
-
-                    {/* Center CTA */}
-                    <div className="absolute inset-0 grid place-items-center">
-                    <button
-                        onClick={() => {
-                        const el = document.getElementById("contact");
-                        if (!el) return;
-                        const headerOffset = 72;
-                        const y = el.getBoundingClientRect().top + window.scrollY - headerOffset;
-                        window.scrollTo({ top: y, behavior: "smooth" });
+                  {/* Service description with expand functionality */}
+                  <div className="absolute inset-x-0 bottom-0 p-7 sm:p-8">
+                    <div className="space-y-4">
+                      <div
+                        className={`
+                          text-white/90 text-base sm:text-lg leading-relaxed
+                          transition-all duration-500
+                          ${expandedCard === s.id 
+                            ? "max-h-[500px] overflow-y-auto pr-2" 
+                            : "max-h-[120px] overflow-hidden"
+                          }
+                        `}
+                        onClick={() => toggleExpand(s.id)}
+                      >
+                        <p>{s.description ?? s.subtitle ?? ""}</p>
+                      </div>
+                      
+                      {/* Expand/Collapse button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleExpand(s.id);
                         }}
                         className="
-                        inline-flex items-center justify-center
-                        rounded-xl px-6 py-4
-                        bg-gold text-black font-semibold
-                        shadow-[0_16px_55px_rgba(0,0,0,0.45)]
-                        hover:brightness-95 transition
+                          flex items-center gap-2
+                          text-gold/90 hover:text-gold
+                          text-sm font-medium
+                          transition-colors
                         "
-                    >
-                        Discuter avec nous
-                    </button>
-                    </div>
+                      >
+                        <span>
+                          {expandedCard === s.id ? "Réduire" : "Lire la suite"}
+                        </span>
+                        <span className={`
+                          transform transition-transform duration-300
+                          ${expandedCard === s.id ? "rotate-180" : ""}
+                        `}>
+                          ↓
+                        </span>
+                      </button>
 
-                    {/* Hover accent */}
-                    <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 bg-gold/12 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      {/* CTA button */}
+                      <button
+                        onClick={() => {
+                          const el = document.getElementById("contact");
+                          if (!el) return;
+                          const headerOffset = 72;
+                          const y = el.getBoundingClientRect().top + window.scrollY - headerOffset;
+                          window.scrollTo({ top: y, behavior: "smooth" });
+                        }}
+                        className="
+                          w-full
+                          inline-flex items-center justify-center
+                          rounded-xl px-6 py-4
+                          bg-black text-white font-semibold
+                          shadow-[0_16px_55px_rgba(0,0,0,0.45)]
+                          hover:brightness-95 transition
+                          mt-4
+                        "
+                      >
+                        Discuter avec nous
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Hover accent */}
+                  <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 bg-gold/12 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </div>
               </article>
-
             ))}
           </div>
         </div>

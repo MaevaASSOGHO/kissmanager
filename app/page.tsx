@@ -8,6 +8,11 @@ import Contact from "@/components/Contact";
 import AboutSection from '@/components/AboutSection';
 import CollabSplit from '@/components/CollabSplit';
 
+<head>
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#C9A24D" />
+</head>
+
 type ServiceItem = {
   id: string;
   title: string;
@@ -30,26 +35,26 @@ export default function Home() {
   const services: ServiceItem[] = [
     {
       id: "01",
-      title: "Marketing Strategies",
-      subtitle: "Une stratégie claire, alignée à votre ADN de marque.",
+      title: "Stratégie Réseaux",
+      subtitle: "Nous immergeons dans l’essence de votre marque pour en saisir l’ADN et définir votre cible idéale. Sur cette base, nous élaborons une stratégie distinctive, conçue pour vous différencier durablement, cultiver une présence digitale désirable et accroître votre chiffre d’affaires.",
       image: "/services/strategy.jpg",
     },
     {
       id: "02",
-      title: "Content Creation",
-      subtitle: "Des contenus premium, cohérents, qui captent l’attention.",
-      image: "/services/creation.jpg",
-    },
-    {
-      id: "03",
-      title: "Marketing Campaigns",
-      subtitle: "Des campagnes pensées pour performer sur toute la chaîne.",
+      title: "Community Management",
+      subtitle: "Notre agence orchestre l’intégralité de votre présence digitale avec rigueur et créativité. De la conception stratégique à la rédaction sur-mesure, en passant par la production de contenus premium et la gestion de vos plateformes, nous assurons une représentation parfaite de votre marque.",
       image: "/services/campaigns.jpg",
     },
+    // {
+    //   id: "03",
+    //   title: "Marketing Campaigns",
+    //   subtitle: "Des campagnes pensées pour performer sur toute la chaîne.",
+    //   image: "/services/strategy.jpg",
+    // },
     {
       id: "04",
-      title: "Social Media Marketing",
-      subtitle: "Gestion, publication, communauté : une exécution complète.",
+      title: "Consulting",
+      subtitle: "Nous proposons un accompagnement expert, adapté à vos besoins ou à ceux de vos équipes. Que ce soit sous forme d’audit détaillé, de suivi personnalisé ou de formation sur mesure en présentiel ou à distance, notre objectif est d’amplifier votre rayonnement et d’optimiser vos performances commerciales.",
       image: "/services/social.jpg",
     },
   ];
@@ -59,43 +64,43 @@ export default function Home() {
   const collaborations = [
     {
       id: 1,
-      company: "Luxe Fashion Paris",
-      description: "Gestion complète de la stratégie Instagram et TikTok pour une marque de mode de luxe. Résultat : +300% d'engagement en 3 mois.",
-      category: "Mode Luxe",
-      image: "/collaborations/collaboration1.jpg"
+      company: "Iron Man Supplements",
+      description: "Gestion complète de la stratégie Instagram et TikTok pour une marque de mode de nutrition sportive.. Résultat : +300% d'engagement en 3 mois.",
+      category: "Mode Nutrition",
+      image: "/collaborations/collab2.JPG"
     },
-    {
-      id: 2,
-      company: "TechInnovate Solutions",
-      description: "Consulting et formation de l'équipe marketing sur les meilleures pratiques LinkedIn. Augmentation de 150% des leads générés.",
-      category: "Technologie",
-      image: "/collaborations/collab2.jpg",
-    },
-    {
-      id: 3,
-      company: "Gourmet Experience",
-      description: "Community management sur Facebook et Instagram pour un groupe de restaurants gastronomiques. Croissance de 200% de la communauté.",
-      category: "Restauration",
-      image: "/collaborations/collab3.jpg"
-    },
-    {
-      id: 4,
-      company: "Wellness & Co",
-      description: "Stratégie de contenu et gestion communautaire pour une marque de bien-être. +250% de croissance d'audience en 4 mois.",
-      category: "Bien-être",
-      image: "/collaborations/collab2.jpg",
-    }
+    // {
+    //   id: 2,
+    //   company: "TechInnovate Solutions",
+    //   description: "Consulting et formation de l'équipe marketing sur les meilleures pratiques LinkedIn. Augmentation de 150% des leads générés.",
+    //   category: "Technologie",
+    //   image: "/collaborations/collab4.JPG",
+    // },
+    // {
+    //   id: 3,
+    //   company: "Gourmet Experience",
+    //   description: "Community management sur Facebook et Instagram pour un groupe de restaurants gastronomiques. Croissance de 200% de la communauté.",
+    //   category: "Restauration",
+    //   image: "/collaborations/collab5.JPG"
+    // },
+    // {
+    //   id: 4,
+    //   company: "Wellness & Co",
+    //   description: "Stratégie de contenu et gestion communautaire pour une marque de bien-être. +250% de croissance d'audience en 4 mois.",
+    //   category: "Bien-être",
+    //   image: "/collaborations/collab6.JPG",
+    // }
   ];
 
   // Marques partenaires  
-const brands = [
-  { id: 1, name: "Air Côte d'Ivoire", logo: "/work/airciv.webp", preview: "/work/airciv.webp" },
-  { id: 2, name: "Aliwax", logo: "/work/aliwax.jpg", preview: "/work/aliwax.jpg" },
-  { id: 3, name: "L'Oréal", logo: "/work/loreal.png", preview: "/work/loreal.png" },
-  { id: 4, name: "Elie Kuame", logo: "/work/eliekuame.webp", preview: "/work/eliekuame.webp" },
-  { id: 5, name: "Fenty Beauty", logo: "/work/fenty.webp", preview: "/work/fenty.webp" },
-  { id: 6, name: "Will Fitness", logo: "/work/Will-Fitness_BAAB.jpg", preview: "/work/Will-Fitness_BAAB.jpg" },
-];
+  const brands = [
+    { id: 1, name: "Palmita", logo: "/work/collab1.JPG", preview: "/work/collab1.JPG" },
+    { id: 2, name: "Djelika", logo: "/work/collab4.JPG", preview: "/work/collab4.JPG" },
+    { id: 3, name: "BC.Darling", logo: "/work/collab5.JPG", preview: "/work/collab5.JPG" },
+    { id: 5, name: "Iron Man Supplements", logo: "/work/collab7.JPG", preview: "/work/collab7.JPG" },
+    { id: 6, name: "Mariz Boutik", logo: "/work/collab8.JPG", preview: "/work/collab8.JPG" },
+    { id: 7, name: "The Sunny", logo: "/work/collab9.JPG", preview: "/work/collab9.JPG" },
+  ];
 
   // Navigation fluide
   const scrollToSection = (sectionId: string) => {
@@ -433,8 +438,11 @@ const brands = [
               <p className="text-gray-400 max-w-md">
                 Expertise d&apos;excellence en stratégie réseaux sociaux pour les marques ambitieuses.
               </p>
-              <p className="mt-4 text-gray-400">
+              <p className="mt-4 text-gray-500">
                 📍 Abidjan, Côte d&apos;Ivoire
+              </p>
+              <p className='mt-4 text-gray-500'>
+                📞 +225 05 66 88 52 89
               </p>
             </div>
             
@@ -475,18 +483,18 @@ const brands = [
           
           <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
             <div className="text-gray-500 text-sm mb-4 md:mb-0">
-              &copy; {new Date().getFullYear()} Kiss Manager. Tous droits réservés.
+              &copy; {new Date().getFullYear()} MEEZIUM. Tous droits réservés.
             </div>
             
             <div className="flex space-x-6">
               <a href="#" className="text-gray-400 hover:text-gold transition-colors">
                 LinkedIn
               </a>
-              <a href="#" className="text-gray-400 hover:text-gold transition-colors">
+              <a href="https://www.instagram.com/kissmanager?igsh=MTg2Mm50Y3hoMTk4aw==" className="text-gray-400 hover:text-gold transition-colors">
                 Instagram
               </a>
-              <a href="#" className="text-gray-400 hover:text-gold transition-colors">
-                Twitter
+              <a href="https://www.tiktok.com/@shanakissoff?_r=1&_t=ZM-92a6fYeuP4S" className="text-gray-400 hover:text-gold transition-colors">
+                TikTok
               </a>
             </div>
           </div>

@@ -171,9 +171,9 @@ export function StatsStrip() {
         accent: true,
       },
       {
-        value: 300000,
-        suffix: "",
-        label: "J’aime générés",
+        value: + 3000,
+        suffix: "%",
+        label: "d'engagement",
         accent: false,
       },
       {
