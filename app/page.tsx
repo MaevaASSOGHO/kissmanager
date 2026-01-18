@@ -7,6 +7,7 @@ import WorkGrid from "@/components/WorkGrid";
 import Contact from "@/components/Contact";
 import AboutSection from '@/components/AboutSection';
 import CollabSplit from '@/components/CollabSplit';
+import image from 'next/image';
 
 <head>
   <link rel="manifest" href="/manifest.json" />
@@ -33,17 +34,23 @@ export default function Home() {
 
   // Données des services
   const services: ServiceItem[] = [
+     {
+      id: "04",
+      title: "Consulting",
+      subtitle: "Nous proposons un accompagnement expert, adapté à vos besoins ou à ceux de vos équipes. Que ce soit sous forme d’audit détaillé, de suivi personnalisé ou de formation sur mesure en présentiel ou à distance, notre objectif est d’amplifier votre rayonnement et d’optimiser vos performances commerciales.",
+      image: "/services/cnsulting.jpg",
+    },
     {
       id: "01",
       title: "Stratégie Réseaux",
       subtitle: "Nous immergeons dans l’essence de votre marque pour en saisir l’ADN et définir votre cible idéale. Sur cette base, nous élaborons une stratégie distinctive, conçue pour vous différencier durablement, cultiver une présence digitale désirable et accroître votre chiffre d’affaires.",
-      image: "/services/strategy.jpg",
+      image: "/services/strategie.jpg",
     },
     {
       id: "02",
       title: "Community Management",
       subtitle: "Notre agence orchestre l’intégralité de votre présence digitale avec rigueur et créativité. De la conception stratégique à la rédaction sur-mesure, en passant par la production de contenus premium et la gestion de vos plateformes, nous assurons une représentation parfaite de votre marque.",
-      image: "/services/campaigns.jpg",
+      image: "/services/community.jpg",
     },
     // {
     //   id: "03",
@@ -51,45 +58,40 @@ export default function Home() {
     //   subtitle: "Des campagnes pensées pour performer sur toute la chaîne.",
     //   image: "/services/strategy.jpg",
     // },
-    {
-      id: "04",
-      title: "Consulting",
-      subtitle: "Nous proposons un accompagnement expert, adapté à vos besoins ou à ceux de vos équipes. Que ce soit sous forme d’audit détaillé, de suivi personnalisé ou de formation sur mesure en présentiel ou à distance, notre objectif est d’amplifier votre rayonnement et d’optimiser vos performances commerciales.",
-      image: "/services/social.jpg",
-    },
+   
   ];
 
 
   // Données des collaborations
   const collaborations = [
     {
+      id: 2,
+      company: "Safarel Obiang – Artiste",
+      description: "Direction artistique et création de contenus stratégiques pour le lancement du son TANA. Nous avons construit une identité visuelle forte et une narration digitale cohérente, pensée pour capter l’attention et créer de l’engagement autour du projet. Résultat : une campagne digitale alignée à l’image de l’artiste, des contenus viraux et une meilleure connexion avec la communauté.",
+      category: "Musique",
+      image: "/collaborations/safarel.jpg",
+    },
+    {
       id: 1,
       company: "Iron Man Supplements",
       description: "Gestion complète de la stratégie Instagram et TikTok pour une marque de mode de nutrition sportive.. Résultat : +300% d'engagement en 3 mois.",
       category: "Mode Nutrition",
-      image: "/collaborations/collab2.JPG"
+      image: "/collaborations/iron.jpg"
     },
-    // {
-    //   id: 2,
-    //   company: "TechInnovate Solutions",
-    //   description: "Consulting et formation de l'équipe marketing sur les meilleures pratiques LinkedIn. Augmentation de 150% des leads générés.",
-    //   category: "Technologie",
-    //   image: "/collaborations/collab4.JPG",
-    // },
-    // {
+     {
     //   id: 3,
-    //   company: "Gourmet Experience",
-    //   description: "Community management sur Facebook et Instagram pour un groupe de restaurants gastronomiques. Croissance de 200% de la communauté.",
-    //   category: "Restauration",
-    //   image: "/collaborations/collab5.JPG"
-    // },
-    // {
-    //   id: 4,
-    //   company: "Wellness & Co",
-    //   description: "Stratégie de contenu et gestion communautaire pour une marque de bien-être. +250% de croissance d'audience en 4 mois.",
-    //   category: "Bien-être",
-    //   image: "/collaborations/collab6.JPG",
-    // }
+       company: "ADIGBALOU",
+       description: "Mise en place d’une stratégie digitale complète, de zéro à une marque visible et rentable. Création de contenus performants, animation quotidienne de la communauté et structuration du positionnement digital. Résultats : Passage de 0 à 15 000 abonnés\n• +500 engagements générés\n• Ventes directes issues des réseaux sociaux",
+       category: "Fitness",
+       image: "/collaborations/adigbalou.jpg"
+     },
+    {
+       id: 4,
+       company: "Lisa – Miss Cosmo Côte d’Ivoire",
+       description: "Création de contenus mettant en valeur l’image, la prestance et l’univers personnel de Lisa. Un travail visuel et narratif pensé pour renforcer son positionnement et sa visibilité digitale. Résultat : une image plus affirmée et une communication plus cohérente sur les réseaux sociaux.",
+       category: "Personnalité Publique",
+       image: "/collaborations/miss.jpg",
+    }
   ];
 
   // Marques partenaires  
