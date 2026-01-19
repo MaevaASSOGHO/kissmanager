@@ -24,7 +24,7 @@ export default function ServicesNetflix({
   const [canLeft, setCanLeft] = useState(false);
   const [canRight, setCanRight] = useState(true);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
-
+ 
   const scrollByCards = (dir: number = 1) => {
     const el = scrollerRef.current;
     if (!el) return;

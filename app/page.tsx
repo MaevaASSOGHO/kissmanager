@@ -70,6 +70,7 @@ export default function Home() {
       description: "Direction artistique et création de contenus stratégiques pour le lancement du son TANA. Nous avons construit une identité visuelle forte et une narration digitale cohérente, pensée pour capter l’attention et créer de l’engagement autour du projet. Résultat : une campagne digitale alignée à l’image de l’artiste, des contenus viraux et une meilleure connexion avec la communauté.",
       category: "Musique",
       image: "/collaborations/safarel.jpg",
+      tags: ["Direction Artistique", "Création de contenu", "Lancement de single"]
     },
     {
       id: 1,
@@ -83,7 +84,8 @@ export default function Home() {
        company: "ADIGBALOU",
        description: "Mise en place d’une stratégie digitale complète, de zéro à une marque visible et rentable. Création de contenus performants, animation quotidienne de la communauté et structuration du positionnement digital. Résultats : Passage de 0 à 15 000 abonnés\n• +500 engagements générés\n• Ventes directes issues des réseaux sociaux",
        category: "Fitness",
-       image: "/collaborations/adigbalou.jpg"
+       image: "/collaborations/adigbalou.jpg",
+       tags: ["Stratégie digitale 360°", "Community Management", "Création de contenu"]
      },
     {
        id: 4,
@@ -91,6 +93,7 @@ export default function Home() {
        description: "Création de contenus mettant en valeur l’image, la prestance et l’univers personnel de Lisa. Un travail visuel et narratif pensé pour renforcer son positionnement et sa visibilité digitale. Résultat : une image plus affirmée et une communication plus cohérente sur les réseaux sociaux.",
        category: "Personnalité Publique",
        image: "/collaborations/miss.jpg",
+       tags: ["Création de contenu", "storytelling", "personal branding"]
     }
   ];
 
@@ -297,7 +300,7 @@ export default function Home() {
               [filter:brightness(.85)_contrast(1.08)_saturate(1.08)]
             "
           >
-            <source src="/hero-video.mp4" type="video/mp4" />
+            <source src="/heros.mp4" type="video/mp4" />
           </video>
 
           {/* Cinematic overlay: keeps video visible but gives readability */}
@@ -489,9 +492,6 @@ export default function Home() {
             </div>
             
             <div className="flex space-x-6">
-              <a href="#" className="text-gray-400 hover:text-gold transition-colors">
-                LinkedIn
-              </a>
               <a href="https://www.instagram.com/kissmanager?igsh=MTg2Mm50Y3hoMTk4aw==" className="text-gray-400 hover:text-gold transition-colors">
                 Instagram
               </a>
